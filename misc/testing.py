@@ -26,11 +26,12 @@ def depth_gen(data, indicies):
 
     newsubindex = []
     for i, letter in enumerate(new):
-        newsubindex.append([letter, (i//2)+1])
+        newsubindex.append([letter, (i // 2) + 1])
     return newsubindex
 
+
 def P(depth, k):
-    PsubGeneration = math.pow(math.e, (-depth/k))
+    PsubGeneration = math.pow(math.e, (-depth / k))
     return PsubGeneration
 
 
@@ -41,3 +42,6 @@ new = depth_gen(data, indicies)
 for node in new:
     node[1] = P(node[1], k)
 print(new)
+
+# TODO: Use new function to guarantee binding to adjacent to one another
+# TODO: Use UUID to generate many new nodes and pass then through the graph algorithm mentioned above
