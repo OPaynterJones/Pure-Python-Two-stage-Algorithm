@@ -1,0 +1,285 @@
+Index: misc/.gitignore
+===================================================================
+diff --git a/misc/.gitignore b/misc/.gitignore
+deleted file mode 100644
+--- a/misc/.gitignore	(revision f3776e71c5dedf266fedf867f084f799d10a59eb)
++++ /dev/null	(revision f3776e71c5dedf266fedf867f084f799d10a59eb)
+@@ -1,103 +0,0 @@
+-.idea/**/workspace.xml
+-.idea/**/tasks.xml
+-.idea/**/usage.statistics.xml
+-.idea/**/dictionaries
+-.idea/**/shelf
+-.idea/**/contentModel.xml
+-.idea/**/dataSources/
+-.idea/**/dataSources.ids
+-.idea/**/dataSources.local.xml
+-.idea/**/sqlDataSources.xml
+-.idea/**/dynamic.xml
+-.idea/**/uiDesigner.xml
+-.idea/**/dbnavigator.xml
+-.idea/**/gradle.xml
+-.idea/**/libraries
+-cmake-build-*/
+-.idea/**/mongoSettings.xml
+-*.iws
+-out/
+-.idea_modules/
+-atlassian-ide-plugin.xml
+-.idea/replstate.xml
+-com_crashlytics_export_strings.xml
+-crashlytics.properties
+-crashlytics-build.properties
+-fabric.properties
+-.idea/httpRequests
+-.idea/caches/build_file_checksums.ser
+-__pycache__/
+-*.py[cod]
+-*$py.class
+-*.so
+-.Python
+-build/
+-develop-eggs/
+-dist/
+-downloads/
+-eggs/
+-.eggs/
+-lib/
+-lib64/
+-parts/
+-sdist/
+-var/
+-wheels/
+-share/python-wheels/
+-*.egg-info/
+-.installed.cfg
+-*.egg
+-MANIFEST
+-*.manifest
+-*.spec
+-pip-log.txt
+-pip-delete-this-directory.txt
+-htmlcov/
+-.tox/
+-.nox/
+-.coverage
+-.coverage.*
+-.cache
+-nosetests.xml
+-coverage.xml
+-*.cover
+-*.py,cover
+-.hypothesis/
+-.pytest_cache/
+-cover/
+-*.mo
+-*.pot
+-*.log
+-local_settings.py
+-db.sqlite3
+-db.sqlite3-journal
+-instance/
+-.webassets-cache
+-.scrapy
+-docs/_build/
+-.pybuilder/
+-target/
+-.ipynb_checkpoints
+-profile_default/
+-ipython_config.py
+-__pypackages__/
+-celerybeat-schedule
+-celerybeat.pid
+-*.sage.py
+-.env
+-.venv
+-env/
+-venv/
+-ENV/
+-env.bak/
+-venv.bak/
+-.spyderproject
+-.spyproject
+-.ropeproject
+-/site
+-.mypy_cache/
+-.dmypy.json
+-dmypy.json
+-.pyre/
+-.pytype/
+-cython_debug/
+\ No newline at end of file
+Index: testing.py
+===================================================================
+diff --git a/testing.py b/testing.py
+deleted file mode 100644
+--- a/testing.py	(revision f3776e71c5dedf266fedf867f084f799d10a59eb)
++++ /dev/null	(revision f3776e71c5dedf266fedf867f084f799d10a59eb)
+@@ -1,43 +0,0 @@
+-import string
+-import math
+-
+-k = 4
+-
+-
+-def reorder(list, start_index):
+-    start_index -= 1
+-    for i in range(start_index + 1, len(list)):
+-        yield list[i]
+-    for i in range(0, start_index):
+-        yield list[i]
+-
+-
+-def circular(input):
+-    while True:
+-        for i in input:
+-            yield i
+-
+-
+-def depth_gen(data, indicies):
+-    data = list(data)
+-    new = []
+-    for _ in range(len(data)):
+-        new.append(data.pop(next(indicies)))
+-
+-    newsubindex = []
+-    for i, letter in enumerate(new):
+-        newsubindex.append([letter, (i//2)+1])
+-    return newsubindex
+-
+-def P(depth, k):
+-    PsubGeneration = math.pow(math.e, (-depth/k))
+-    return PsubGeneration
+-
+-
+-letters = [i for i in string.ascii_lowercase]
+-indicies = circular([0, -1])
+-data = reorder(letters, 3)
+-new = depth_gen(data, indicies)
+-for node in new:
+-    node[1] = P(node[1], k)
+-print(new)
+\ No newline at end of file
+Index: .idea/.gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># Default ignored files\r\n/shelf/\r\n/workspace.xml\r\n# Datasource local storage ignored files\r\n/dataSources/\r\n/dataSources.local.xml\r\n# Editor-based HTTP Client requests\r\n/httpRequests/\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/.gitignore b/.idea/.gitignore
+--- a/.idea/.gitignore	(revision f3776e71c5dedf266fedf867f084f799d10a59eb)
++++ b/.idea/.gitignore	(date 1620067307430)
+@@ -1,8 +1,103 @@
+-# Default ignored files
+-/shelf/
+-/workspace.xml
+-# Datasource local storage ignored files
+-/dataSources/
+-/dataSources.local.xml
+-# Editor-based HTTP Client requests
+-/httpRequests/
++.idea/**/workspace.xml
++.idea/**/tasks.xml
++.idea/**/usage.statistics.xml
++.idea/**/dictionaries
++.idea/**/shelf
++.idea/**/contentModel.xml
++.idea/**/dataSources/
++.idea/**/dataSources.ids
++.idea/**/dataSources.local.xml
++.idea/**/sqlDataSources.xml
++.idea/**/dynamic.xml
++.idea/**/uiDesigner.xml
++.idea/**/dbnavigator.xml
++.idea/**/gradle.xml
++.idea/**/libraries
++cmake-build-*/
++.idea/**/mongoSettings.xml
++*.iws
++out/
++.idea_modules/
++atlassian-ide-plugin.xml
++.idea/replstate.xml
++com_crashlytics_export_strings.xml
++crashlytics.properties
++crashlytics-build.properties
++fabric.properties
++.idea/httpRequests
++.idea/caches/build_file_checksums.ser
++__pycache__/
++*.py[cod]
++*$py.class
++*.so
++.Python
++build/
++develop-eggs/
++dist/
++downloads/
++eggs/
++.eggs/
++lib/
++lib64/
++parts/
++sdist/
++var/
++wheels/
++share/python-wheels/
++*.egg-info/
++.installed.cfg
++*.egg
++MANIFEST
++*.manifest
++*.spec
++pip-log.txt
++pip-delete-this-directory.txt
++htmlcov/
++.tox/
++.nox/
++.coverage
++.coverage.*
++.cache
++nosetests.xml
++coverage.xml
++*.cover
++*.py,cover
++.hypothesis/
++.pytest_cache/
++cover/
++*.mo
++*.pot
++*.log
++local_settings.py
++db.sqlite3
++db.sqlite3-journal
++instance/
++.webassets-cache
++.scrapy
++docs/_build/
++.pybuilder/
++target/
++.ipynb_checkpoints
++profile_default/
++ipython_config.py
++__pypackages__/
++celerybeat-schedule
++celerybeat.pid
++*.sage.py
++.env
++.venv
++env/
++venv/
++ENV/
++env.bak/
++venv.bak/
++.spyderproject
++.spyproject
++.ropeproject
++/site
++.mypy_cache/
++.dmypy.json
++dmypy.json
++.pyre/
++.pytype/
++cython_debug/
+\ No newline at end of file
