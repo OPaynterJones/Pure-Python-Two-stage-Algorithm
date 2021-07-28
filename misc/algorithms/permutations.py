@@ -28,3 +28,4 @@ class C:
         :param perm_state: the order of corners in  permutation.
         :return: returns index number of given permutation.
         """
+        # TODO write this function regarding permutations and research variable base representation/encoding.
