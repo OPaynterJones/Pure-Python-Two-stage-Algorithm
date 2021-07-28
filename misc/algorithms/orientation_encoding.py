@@ -7,7 +7,10 @@
 
 
 class C:
-    """Abstract Corner class."""
+    """
+    Abstract Corner class.
+    :cvar Cparity: the resultant value appended to orientation to make sum(orientations)%3 = 0
+    """
 
     Cparity: dict[int, int] = {
         0: 0,
@@ -18,37 +21,23 @@ class C:
     @staticmethod
     def get_index(orientation: int) -> int:
         """
-        Return index number of an corner orientation.
-
-        timeit("C.get_index(20011002)", setup="from encoding import C")
-        0.3337274000000008
+        Get index number of corner orientation.
+        
+        :speed_test timeit("C.get_index(20011002)", setup="from file import C"): 0.3337274000000008
+        :param orientation: orientation of corners.
+        :return: index number of given orientation.
         """
 
         return int(str(orientation)[:-1], 3)
 
     @staticmethod
-    def get_orientation_numpy(index: int) -> int:
+    def get_orientation(index: int) -> int:
         """
-        Return the orientation of all corners of an index, using numpy.
-
-        timeit("C.get_orientation_numpy(1494)", setup="from encoding import C")
-        1.5905366
-        """
-
-        from numpy import base_repr
-
-        n = base_repr(index, base=3)
-        parity = int(n) % 3
-
-        return int(f"{n}{C.Cparity[parity]}")
-
-    @staticmethod
-    def get_orientation_builtins(index: int) -> int:
-        """
-        Return the orientation of all corners of an index, using builtins.
-
-        timeit("C.get_orientation_builtins(1494)", setup="from encoding import C")
-        2.1323447999999985
+        Get orientation of corners of given index.
+        
+        :speed_test timeit("C.get_orientation(1494)", setup="from file import C"): 2.1323447999999985
+        :param index: index number to be converted.
+        :return: orientation of given index.
         """
 
         parity = 0
@@ -62,6 +51,23 @@ class C:
 
         return int(ori[::-1] + str(parity % 3))
 
+    @staticmethod
+    def get_orientation_numpy(index: int) -> int:
+        """
+        Get orientation of corners of given index, using numpy.
+        
+        :speed_test timeit("C.get_orientation_numpy(1494)", setup="from file import C"): 1.5905366
+        :param index: index number to be converted.
+        :return: orientation of given index.
+        """
+
+        from numpy import base_repr
+
+        n = base_repr(index, base=3)
+        parity = int(n) % 3
+
+        return int(f"{n}{C.Cparity[parity]}")
+
 
 # There are 2048 possible ways to orientate the edges on a Rubik's Cube (2^11).
 # NOTE: The first 11 edges determine the orientation of the last, hence 2^11 (sum(orientations)%2 = 0).
@@ -71,26 +77,30 @@ class C:
 # The inverse can be applied to obtain the orientation of all the edges given it's index number.
 
 class E:
-    """Abstract Edge class."""
+    """
+    Abstract Edge class.
+    """
 
     @staticmethod
     def get_index(orientation: int) -> int:
         """
-        Return index number of an edge orientation.
-
-        timeit("E.get_index(111111111111)", setup="from corner_ternary_encoding import E")
-        0.357996600000007
+        Get index number of edge orientation.
+        
+        :speed_test timeit("E.get_index(111111111111)", setup="from file import E"): 0.357996600000007
+        :param orientation: orientation of edges.
+        :return: index number of given orientation.
         """
 
         return int(str(orientation)[:-1], 2)
 
     @staticmethod
-    def get_orientation_builtins(index: int) -> int:
+    def get_orientation(index: int) -> int:
         """
-        Return the orientation of all edges of an index, using builtins.
-
-        timeit("E.get_orientation_builtins(1878)", setup="from encoding import E")
-        2.9557498000000066
+        Get orientation of edges of given index.
+        
+        :speed_test timeit("E.get_orientation(1878)", setup="from file import E"): 2.9557498000000066
+        :param index: index number to be converted.
+        :return: orientation of given index.
         """
 
         parity = 0
@@ -105,10 +115,11 @@ class E:
     @staticmethod
     def get_orientation_numpy(index: int) -> int:
         """
-        Return the orientation of all edges of an index, using numpy.
-
-        timeit("E.get_orientation_numpy(1878)", setup="from encoding import E")
-        2.1355667999999994
+        Get orientation of edges of given index, using numpy.
+        
+        :speed_test timeit("E.get_orientation_numpy(1878)", setup="from file import E"): 2.1355667999999994
+        :param index: index number to be converted.
+        :return: orientation of given index.
         """
 
         from numpy import binary_repr
