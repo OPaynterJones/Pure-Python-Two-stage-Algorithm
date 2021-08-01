@@ -1,4 +1,4 @@
-# There are 2187 possible ways to orientate the corners on a Rubik's Cube (3^7).
+# There are 2186 possible ways to orientate the corners on a Rubik's Cube (3^7 - 1).
 # NOTE: The first 7 corners determine the orientation of the last, hence 3^7 (sum(orientations)%3 = 0).
 # The orientation of all the corners can be encoded using the ternary number system.
 # Each corner has a rotation o, o ∈ {0, 1, 2}.
