@@ -1,119 +1,103 @@
+
+---
+layout: default
+title: "Rubiks Cube Blog"
+---
+<a href="./" style="color: black; text-decoration: underline;text-decoration-style: dotted;">Back</a>
+  
+ (Scroll down for code samples!)
 # Rubiks cube solver 
-The challenge itself: 
+## The Two-Phase algorithm
 
-When applying hte processing power of computers to a real-life application, the process requires several conditions be satisfied: the real-life can be translated to some form of data; the data might be manipulated
-
-Satisifying both of these conditions simultainously to some degree of success is the largest obstacle for this problem. A cube has ~43 quintilliion unique permutations - can't use a lookup table. The pieces on a cube have both a permutation and an orientation - can't use a simple number based system or describe it with some hashign algorithm. The cube needs to be encoded into a manner that permits quick and efficient maniuplation for additional search hueristics or other puprposes. 
-
-To tackle the first lemma, we must realise that a cube cannot be represented holistally on a computer in a way that one might represent a cube for a grahpical interface - a series of cubies in a 3d space with orientation and position data; we cannot represent it by it's "stickers" or facelets as that's simply too inefficient. Realising this, we might conclude that we can represent a cube by both the **identity** of the pieces and their orientation.
-
-Again, to allow for efficient manipulation, we decide to represent the identity and orientation of some different classes of pieces, such as corners or edges, as required. 
-
-Assumign some such systems exist, we can therefore conclude that an application data-stcuture for representing a cube is a system of coordinates that can each represent a cube. In it's simplist form, a cube can be represented by 4 coordinates corncering the orientaiton and position of both the edges and the corners. We have satisfied the first lemma. 
-
-The second lemma warrents that the data strcuture we have created can be easily manipulated: seperating both the orientation and identiy of the pieces on the cube we can quite easily manipulate them simply by exchanging the identiy of the pieces in specified locations, and "applying" some additional orientation factor to the pieces as they are manipulated. We can store the aforementioned locations and change-in-orientation as pre-defined "moves" that we can apply to the move through a slightly m ore complicated applicaiton of the above method. 
-
-## The two phase algorithm
-
-Each cube can be represented by a series of coordinates that each describe an attribute of that cube. For instance, the orientation of the corners and the edges, or the position of some pieces. 
-
-Certain turns of the cube's faces do not effect some of these attributes. For instance, double turns of any face but the cube's relative top and bottom will not change the orientation of the corners or edges.
-
-With this information, it's possible to split the cube's various states into different groups or *co-sets* that are achievable whilst a constraint has been placed on the moves you can apply to the cube.
+The Two-Phase algorithm will have each of its parts explained in more detail later on, but for now, a general overview: 
+Obviously, of the ~43 quintillion variations of a Rubik's Cube, only 1 is the solved cube - that's our objective. Somewhere buried in the sea of all the Cube's states is our initial scrambled state and we have to navigate between adjacent ones to somehow find our way to that singular goal. Pretending that the navigation between states was instantaneous, the obstacle of searching through that many different elements (with circular paths included) is practically intractable. The Two-Phase algorithm does what it says on the tin - it divides the problem into two phases, each a fraction of the magnitude of the original.
 
 # Phase One
-The first group, you only consider the orientation of the corners and edges, as well as the position of the edges in
-the *UD-slice* - the positions sandwiched between the U and D faces. You do not consider how these edges are orientated
-or positioned, just which positions are occupied by these middle edges.
+Before we talk about groups or subgroups, it's important to understand the term "orientation" with regards to a Rubiks Cube. In this case, the word orientation will only be used with regards to a cubie(s). For example, a corner or an edge. An edge can be orientated in one of two ways, and a corner in one of three. 
+For the orientation of a cubie to be "maintained", it means that if the cubie were to move about the cube under some sequence of moves before eventually landing back where it started, it will still have the same orientation as when it started. E.g. If a white sticker was facing up on an edge or a corner and you shuffled the cube about until it the corner returned to the position it started, the white sticker would still be facing up if the orienation was maintained. 
 
-This effectively limits both the quantity of data you have to keep tract of when manipulating the cube (for instance,
-the position of edges and corners are only later considered), and the distance you have to search through to reach the "
-solved" state of this group, or the identity element - a cube where the edges and corners are orientated correctly, and
-where the UD-slice edges - the edges that originate from the UD-slice of a solved cube - are in their home slice.
+In Phase One of the Two-Phase algorithm, you consider the subgroup G1 of all cube states G. Before G1 is defined, In G1 you only consider the orientation of the corners and edges, as well as the position of the edges whose origin lies in the *UD-slice* (the cubies sandwiched between the U and D faces). You do not consider how these edges are orientated or in what permutation, just whether they are in the UD-slice again or not. The intuition behind all of this will be explained later. 
 
-The aforementioned coordinates are represented in various ways that are each optimised for their uses:
+We're going to assign a "coordinate" to each aforementioned aspect, to create a tuple of corner orientation, edge orientation, and UD-slice edge position. As the name implies, each coordinate is going to be used as something of a signpost in the sea of states so that we can reduce the chaos search space and navigate it more easily.
+
+The coordinates are calculated in various ways that are each optimized for use cases:
 
 ### The corner orientation coordinate
 
-A corner can be orientated one of three ways which; a ternary number system is perhaps the most fitting method of
-representing each corner's orientation.
+A corner can be orientated in one of three ways:
 
-- **0** implies that the corner is not rotated from its default state (as defined in some basic setup)
+- **0** implies that the corner has not been rotated from its default state as defined in the program
 - **1** that the corner has been twisted once clockwise
-- **2** that the conner has been twisted twice clockwise - this is synonymous with an anti-clockwise rotation.
+- **2** that the corner has been twisted twice clockwise, or once anti-clockwise
 
-It follows that we can store the orientation of each corner as `ori = ori mod 3` to ensure that the orientation
-doesn't "grow" as it changes throughout the solve.
+It follows that we can store the orientation of each corner as `o = o mod 3` to ensure that the orientation doesn't "grow" as it changes throughout the program. This means that each corner's orientation can be represented by a single digit. With all 8 corners of a cube combined, we can store all their orientations in a single 8-digit ternary number. 
 
-To minimise the size of the ternary number, we can exclude the last corner, now only using 7 bits, as for a cube to be
-reachable through valid means the sum of all the orientations of the corners (modulo 3) must satisfy `sum modulo 3 = 0`.
-Intuitively this means that there is not a singular corner twisted individually, as a turn of the face will always
-impact 4 corners.
+We can cut a digit off of that number, however, by excluding a corner from our calculations, now only using 7 bits. This is possible because for a cube to be valid through traditional means (not taking the stickers off or spinning corners in place), the sum of all the orientations of the corners must be divisible by 3 or `orientation_sum mod 3 = 0`. This can be intuitively explained by understanding that when you turn a face on the cube, 4 corners *must* be maneuvered. To edit the orientation of a single corner is to disassemble the cube in some way, which is not ideal...
 
-The following function reduces the orientation of the corners to a ternary number within the
-range `3 pow 7 - 1 = 2186 <---> 0`:
+The following function converts the ternary number representing all the orientations of the corners to a smaller decimal number or coordinate `n ∈ [0, 3 pow 7) = [0, 2186]`:
 
 `[0, 2, 2, 0, 2, 2, 1, 0] --> 673`
 
 ```python
-def corner_orientation_coordinates(self):
-    co = reduce(lambda variable_base, total: 3 * variable_base + total, self.co[:7])
+def corner_orientation_coordinate(ternary_n):
+    dec_coord = reduce(lambda total, new_bit: 3 * total + new_bit, ternary_n[:7])
 
-    return co
+    return dec_coord
 ```
 
-The following does the opposite, taking the index of the element in the corner orientation co-set of the cube group and
-computing the orientation of the corners:
+The following does the opposite, taking the decimal number and converting it back into the orientation of all of the corners, which also calculating the sum of all orientations to derrive the orientation of the corner we ommited previously:
 
 ```python
-def Ocorner_coords(self, index):
+corner_orientation_parity = [0, 2, 1]
+
+def get_corner_orientation(coord):
     parity = 0
-    self.co = [-1] * 8
-    for _ in range(6, -1, -1):
-        parity += index % 3
-        self.co[_] = index % 3
+    ternary_n = [-1] * 8
+    for i in range(6, -1, -1):
+        parity += coord % 3
+        ternary_n [i] = coord % 3
         index //= 3
 
     parity %= 3
-    parity = self.__Ocorner_parity_value[parity]
-    self.co[-1] = parity
+    # Get the corresponding corner orientation such that the total mod 3 = 0
+    ternary_n[7] = corner_orientation_parity[parity]
+    return ternary_n
 ```
 
 ### The edge orientation coordinate
-The orientation of the edges can be defined in much the same way - a binary system is used where *0* implies an unflipped edge and *1* the contrary.
+The edge orientation coordinate can be defined in much the same way - a binary system is used where *0* implies an unflipped edge and *1* the contrary.
 
-Again, a similar method can be used to minimise the size of said number: the orientation of the final edge is omitted and calculated such that `sum mod 2 = 0`.
+A similar method can be used to minimise the size of said number: the orientation of the final edge is omitted and calculated such that `sum mod 2 = 0`.
 ```python
-@property
-def Oedge_coords(self):
-    eo = reduce(lambda variable_base, total: 2 * variable_base + total, self.eo[:11])
-
-    return eo
+def edge_orientation_coordinate(binary_n):
+    dec_coord = reduce(lambda total, new_bit: 2 * total + new_bit, binary_n[:11])
+		
+		return dec_coord
 ```
 The index of the element has range `2 pow 11 - 1 = 2047 <---> 0` and the following function reverses it in a similar manner to the corners:
 ```python
-@Oedge_coords.setter
-def Oedge_coords(self, index):
+def get_edge_orientation(coord):
     parity = 0
-    self.eo = [-1] * 12
-    for _ in range(10, -1, -1):
-        parity += index % 2
-        self.eo[_] = index % 2
-        index //= 2
+    binary_n = [-1] * 12
+    for i in range(10, -1, -1):
+        parity += coord % 2
+        binary_n[i] = coord % 2
+        coord //= 2
 
-    self.eo[-1] = parity % 2
+    binary_n[11] = parity % 2
+    return binary_n
 ```
 
 ### The UD-slice coordinate
-The UD-slice coordinate uses a different encoding method altogether. At this point in the algorithm, the only nessessary data is **where** the UD-slice edges are, and not how they are rotated or where they are each positioned.
+The UD-slice coordinate uses a different encoding method altogether, as we are not dealing with a the permutation, nor the orientation of some pieces but the *general* position - remember that we're not concerned with what piece is where in the UD-slice, only that the pieces are in their "home slice".
 
-There are 4 edges, each of which can exist in one of 12 edges and it follow that the coordinate has range `2*11*10*9/4! - 1 = 494`.
+There are 4 edges, each of which can exist in one of 12 edge "slots", hence the coordinate `n ∈ [0, 12*11*10*9/4!) = [0, 494]`
 
-The algoritm uses an array to represent each elelent in the UD-slice co-set much as the other methods of encoding expalined above, however assignes each of the elements in said array with a weight correspoding to their position `0, 1... 10, 11` and works from right to left: 
+The algorithm uses an array to represent each "position" that an edge can occupy much the same as the other methods of encoding expalined above. It does, however, have a "variable base" this time around, where the weight correspoding to each position in the array is  `0, 1... 10, 11` from right to left: 
 
-The number of UD-slice edges seen at the beginning of the algorithm is `4 - 1=3` such that `C(weight, seen_edges)` calculates the set of combinations of the remaining edges in the remaining spaces. This only works as all UD-slice edges are consiered homogenous here, so they are completely interchangable with one another. 
+The number of UD-slice edges seen at the beginning of the algorithm is `4-1 = 3` such that `C(weight, seen_edges)` calculates the set of combinations of the remaining edges in the remaining spaces. This only works as all UD-slice edges are consiered homogenous here, so they are completely interchangable with one another. 
 
-The algorihtm maps each element to an index on a 1 to 1 basis, and the identity elemnent is 0 here also, representing when the UD-slice edges are all stacked in final 4 positions in the array. Intuitively this means that they are all present in the UD-slice, but not necessarily in the right position nor orientation for the cube to be consiered solved. When the order of the edges are defined, the UD-slice edges are defined last, such that this method of encoding is applicable:
+The algorithm maps each element to an index on a 1 to 1 basis, and the identity elemnent is 0 here also, representing when the UD-slice edges are all stacked in final 4 positions in the array. Intuitively this means that they are all present in the UD-slice, but not necessarily in the right position nor orientation for the cube to be consiered solved. When the order of the edges are defined, the UD-slice edges are defined last, such that this method of encoding is applicable:
 
 ```python
 class edge_indices(IntEnum):
@@ -606,7 +590,7 @@ One such subgroup is the subgroup we will call H:
 
 Let's imagine a solved cube, then restickering it in a such a fashion: 
 
-![H-cube](https://github.com/MorsUltra/NEA/blob/main/docs/h_cube.PNG)
+![H-cube](./images/h_cube.PNG)
 
 Opposite colours are restickered to be homogenous, and all the stickers that do not constitute a part of a UD-slice or top/bottom face are removed. 
 
@@ -626,7 +610,7 @@ So the subgroup H is composed of all cubes that satisfy H's specific conditions,
 
 Let's imagine that we take that solved but restickered cube, and we apply some move to it. It's H form - restickered as shown above - is completely unique:
 
-![H*R-cube](https://github.com/MorsUltra/NEA/blob/main/docs/hr_cube.PNG)
+![H*R-cube](./images/hr_cube.PNG)
 
 From it spawn another 19,508,428,800 variations within, that shuffle about all of the pieces such that is still holds the same H form above when restickered, but are wholistically different. Again, apply another move and you have another 19,508,428,800 varitations th at conform to that same H form. 
 
